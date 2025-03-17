@@ -1,41 +1,10 @@
 body {
-    text-align: center;
-    background: #87CEEB;
+    margin: 0;
+    overflow: hidden;
+    background-color: #87CEEB;
 }
-
 canvas {
-    border: 2px solid black;
-    background: #BFD1E5;
-}
-
-.controls {
-    margin-top: 10px;
-}
-
-button {
-    font-size: 20px;
-    padding: 10px;
-    margin: 5px;
-    cursor: pointer;
-}
-
-.inventory {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-}
-
-.inventory button {
-    width: 40px;  /* Ubah dari 50px jadi 40px */
-    height: 40px;
-    padding: 5px;
-    margin: 3px;  /* Supaya lebih rapat */
-    border: 1px solid #000;
-    background: white;
-    cursor: pointer;
-}
-
-.inventory img {
-    width: 100%;  /* Supaya gambar pas dalam tombol */
-    height: 100%;
+    display: block;
+    width: 100vw;
+    height: 100vh;
 }
