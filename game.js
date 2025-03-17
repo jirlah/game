@@ -1,10 +1,9 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 800;
+canvas.width = 1000; // Map luas
 canvas.height = 600;
 
-// Gambar blok
 const assets = {
     player: new Image(),
     grass: new Image(),
@@ -22,103 +21,85 @@ assets.wood.src = "assets/wood.png";
 const player = { x: 100, y: 500, width: 30, height: 50, speed: 5, velocityY: 0, jumping: false };
 const gravity = 0.5;
 const blocks = [];
-const inventory = ["grass", "dirt", "stone", "wood"];
-let selectedBlock = "grass";
+const inventory = ["empty", "grass", "dirt", "stone", "wood"];
+let selectedBlock = "empty"; 
 
 // Buat tanah awal
-for (let i = 0; i < 10; i++) {
-    blocks.push({ x: i * 50, y: 550, type: "dirt", durability: 3 });
+for (let i = 0; i < 25; i++) {
+    blocks.push({ x: i * 40, y: 550, type: "grass" });
 }
 
-// Event keyboard untuk gerakan
-document.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowRight") player.x += player.speed;
-    if (event.key === "ArrowLeft") player.x -= player.speed;
-    if (event.key === "ArrowUp" && !player.jumping) {
-        player.velocityY = -10;
-        player.jumping = true;
-    }
-});
+// Gambar game
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Gambar player
+    ctx.drawImage(assets.player, player.x, player.y, player.width, player.height);
+    
+    // Gambar blok
+    blocks.forEach(block => {
+        ctx.drawImage(assets[block.type], block.x, block.y, 40, 40);
+    });
 
-// Kontrol Mobile
-document.getElementById("left").addEventListener("click", () => player.x -= player.speed);
-document.getElementById("right").addEventListener("click", () => player.x += player.speed);
-document.getElementById("jump").addEventListener("click", () => {
+    requestAnimationFrame(draw);
+}
+
+// Gerakan
+function moveLeft() { player.x -= player.speed; }
+function moveRight() { player.x += player.speed; }
+function jump() {
     if (!player.jumping) {
         player.velocityY = -10;
         player.jumping = true;
     }
-});
+}
 
-// Event untuk klik atau sentuhan (HP)
-canvas.addEventListener("pointerdown", (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    let blockDestroyed = false;
-    
-    for (let i = 0; i < blocks.length; i++) {
-        if (mouseX > blocks[i].x && mouseX < blocks[i].x + 50 &&
-            mouseY > blocks[i].y && mouseY < blocks[i].y + 50) {
-            
-            blocks[i].durability -= 1;
-            if (blocks[i].durability <= 0) {
-                blocks.splice(i, 1);
-            }
-            blockDestroyed = true;
-            break;
-        }
-    }
-
-    // Jika tidak ada blok yang dihancurkan, tambahkan blok baru
-    if (!blockDestroyed) {
-        blocks.push({ 
-            x: Math.floor(mouseX / 50) * 50, 
-            y: Math.floor(mouseY / 50) * 50, 
-            type: selectedBlock, 
-            durability: 3 
-        });
-    }
-});
-
-// Render game
-function gameLoop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Gambar pemain
-    ctx.drawImage(assets.player, player.x, player.y, player.width, player.height);
-
-    // Gambar blok
-    for (let block of blocks) {
-        ctx.drawImage(assets[block.type], block.x, block.y, 50, 50);
-    }
-
-    // Fisika lompat
+// Update posisi
+function update() {
     player.y += player.velocityY;
     player.velocityY += gravity;
-
-    if (player.y >= 500) {
+    
+    if (player.y >= 500) { 
         player.y = 500;
         player.jumping = false;
     }
-
-    requestAnimationFrame(gameLoop);
+    
+    requestAnimationFrame(update);
 }
 
-// Pilih blok dari inventori
-function updateInventory() {
-    const inventoryDiv = document.getElementById("inventory");
-    inventoryDiv.innerHTML = "";
+// Pilih blok di inventori
+function selectBlock(type) {
+    selectedBlock = type;
+}
 
-    inventory.forEach(block => {
-        let blockButton = document.createElement("button");
-        blockButton.innerText = block;
-        blockButton.onclick = () => selectedBlock = block;
-        inventoryDiv.appendChild(blockButton);
+// Hancurkan blok
+canvas.addEventListener("click", (event) => {
+    const clickX = event.clientX - canvas.offsetLeft;
+    const clickY = event.clientY - canvas.offsetTop;
+    
+    blocks.forEach((block, index) => {
+        if (clickX > block.x && clickX < block.x + 40 &&
+            clickY > block.y && clickY < block.y + 40) {
+            if (selectedBlock === "empty") {
+                blocks.splice(index, 1);
+            }
+        }
     });
-}
+});
+
+// Letakkan blok baru
+canvas.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+    if (selectedBlock !== "empty") {
+        const clickX = Math.floor((event.clientX - canvas.offsetLeft) / 40) * 40;
+        const clickY = Math.floor((event.clientY - canvas.offsetTop) / 40) * 40;
+        
+        if (!blocks.some(block => block.x === clickX && block.y === clickY)) {
+            blocks.push({ x: clickX, y: clickY, type: selectedBlock });
+        }
+    }
+});
 
 // Mulai game
-updateInventory();
-gameLoop();
+draw();
+update();
