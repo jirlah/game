@@ -1,29 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Growtopia Offline</title>
+    <title>Game Web Growtopia</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    
-    <!-- Kontrol untuk HP -->
-    <div class="controls">
-        <button onclick="moveLeft()">←</button>
-        <button onclick="moveRight()">→</button>
-        <button onclick="jump()">⮝</button>
-    </div>
-
-    <div class="inventory">
-        <button onclick="selectBlock('empty')">🚫</button>
-        <button onclick="selectBlock('grass')"><img src="assets/grass.png"></button>
-        <button onclick="selectBlock('dirt')"><img src="assets/dirt.png"></button>
-        <button onclick="selectBlock('stone')"><img src="assets/stone.png"></button>
-        <button onclick="selectBlock('wood')"><img src="assets/wood.png"></button>
-    </div>
-
-    <script src="game.js"></script>
+    <script src="script.js"></script>
+    <script src="firebase.js"></script>
 </body>
 </html>
