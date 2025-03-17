@@ -1,29 +1,25 @@
 body {
+    margin: 0;
+    overflow: hidden;
+    background-color: lightblue;
     text-align: center;
-    background-color: #a2d149;
-    font-family: Arial, sans-serif;
 }
 
 canvas {
-    border: 2px solid black;
-    background-color: #87ceeb;
+    display: block;
+    background-color: #87CEEB;
+    margin: auto;
 }
 
-#controls {
+.controls {
     position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
+    bottom: 10px;
+    left: 10px;
 }
 
-#controls button {
+button {
     width: 50px;
     height: 50px;
     font-size: 20px;
-    background-color: white;
-    border: 2px solid black;
-    border-radius: 10px;
-    cursor: pointer;
+    margin: 5px;
 }
