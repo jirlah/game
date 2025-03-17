@@ -1,6 +1,8 @@
+// Import Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
+// Konfigurasi Firebase (GANTI DENGAN KONFIGURASI FIREBASE-MU)
 const firebaseConfig = {
   apiKey: "AIzaSyBL6kFluWUAWJfMlN5QI8um9Yre3lRMlFA",
   authDomain: "game-95268.firebaseapp.com",
@@ -14,15 +16,29 @@ const firebaseConfig = {
 // Inisialisasi Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const chatRef = ref(db, "chat");
 
-// Kirim pesan chat
-function sendMessage(username, message) {
-    push(chatRef, { username, message });
+// Fungsi untuk menyimpan data pemain di Firebase
+function updatePlayer(playerId, x, y, username) {
+    set(ref(db, "players/" + playerId), {
+        x: x,
+        y: y,
+        username: username
+    });
 }
 
-// Ambil pesan terbaru
-onValue(chatRef, (snapshot) => {
+// Fungsi untuk mengambil data pemain dari Firebase
+onValue(ref(db, "players"), (snapshot) => {
+    const players = snapshot.val();
+    console.log(players); // Debugging
+});
+
+// Fungsi untuk mengirim pesan chat
+function sendMessage(username, message) {
+    push(ref(db, "chat"), { username, message });
+}
+
+// Fungsi untuk mendengarkan chat baru
+onValue(ref(db, "chat"), (snapshot) => {
     const messages = snapshot.val();
     console.clear();
     for (let key in messages) {
@@ -31,4 +47,5 @@ onValue(chatRef, (snapshot) => {
 });
 
 // Contoh penggunaan
-sendMessage("Player1", "Halo, ada yang main?");
+updatePlayer("player1", 100, 200, "Player1");
+sendMessage("Player1", "Halo, ini chat pertama!");
