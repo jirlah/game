@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,13 +8,20 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <div id="inventory"></div>
     
-    <!-- Kontrol Mobile -->
+    <!-- Kontrol untuk HP -->
     <div class="controls">
-        <button id="left">←</button>
-        <button id="right">→</button>
-        <button id="jump">⤴</button>
+        <button onclick="moveLeft()">←</button>
+        <button onclick="moveRight()">→</button>
+        <button onclick="jump()">⮝</button>
+    </div>
+
+    <div class="inventory">
+        <button onclick="selectBlock('empty')">🚫</button>
+        <button onclick="selectBlock('grass')"><img src="assets/grass.png"></button>
+        <button onclick="selectBlock('dirt')"><img src="assets/dirt.png"></button>
+        <button onclick="selectBlock('stone')"><img src="assets/stone.png"></button>
+        <button onclick="selectBlock('wood')"><img src="assets/wood.png"></button>
     </div>
 
     <script src="game.js"></script>
