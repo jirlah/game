@@ -1,105 +1,96 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 1000; // Map luas
-canvas.height = 600;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-const assets = {
-    player: new Image(),
+// Load gambar blok
+const blockImages = {
     grass: new Image(),
     dirt: new Image(),
     stone: new Image(),
     wood: new Image()
 };
 
-assets.player.src = "assets/player.png";
-assets.grass.src = "assets/grass.png";
-assets.dirt.src = "assets/dirt.png";
-assets.stone.src = "assets/stone.png";
-assets.wood.src = "assets/wood.png";
+blockImages.grass.src = "assets/blocks/grass.png";
+blockImages.dirt.src = "assets/blocks/dirt.png";
+blockImages.stone.src = "assets/blocks/stone.png";
+blockImages.wood.src = "assets/blocks/wood.png";
 
-const player = { x: 100, y: 500, width: 30, height: 50, speed: 5, velocityY: 0, jumping: false };
-const gravity = 0.5;
-const blocks = [];
-const inventory = ["empty", "grass", "dirt", "stone", "wood"];
-let selectedBlock = "empty"; 
+// Grid dunia
+const world = [];
+const worldWidth = 50;
+const worldHeight = 20;
+const blockSize = 32;
 
-// Buat tanah awal
-for (let i = 0; i < 25; i++) {
-    blocks.push({ x: i * 40, y: 550, type: "grass" });
+// Buat dunia dengan blok acak
+for (let y = 0; y < worldHeight; y++) {
+    let row = [];
+    for (let x = 0; x < worldWidth; x++) {
+        if (y < 10) row.push("grass");
+        else if (y < 15) row.push("dirt");
+        else row.push("stone");
+    }
+    world.push(row);
 }
 
-// Gambar game
+// Render dunia
+function drawWorld() {
+    for (let y = 0; y < worldHeight; y++) {
+        for (let x = 0; x < worldWidth; x++) {
+            const blockType = world[y][x];
+            ctx.drawImage(blockImages[blockType], x * blockSize, y * blockSize, blockSize, blockSize);
+        }
+    }
+}
+
+// Pemain
+const player = {
+    x: 5,
+    y: 5,
+    width: 32,
+    height: 32,
+    speed: 5
+};
+
+// Input kontrol
+const keys = {
+    left: false,
+    right: false,
+    jump: false
+};
+
+window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") keys.left = true;
+    if (e.key === "ArrowRight") keys.right = true;
+    if (e.key === " ") keys.jump = true;
+});
+
+window.addEventListener("keyup", (e) => {
+    if (e.key === "ArrowLeft") keys.left = false;
+    if (e.key === "ArrowRight") keys.right = false;
+    if (e.key === " ") keys.jump = false;
+});
+
+// Update game
+function update() {
+    if (keys.left) player.x -= player.speed;
+    if (keys.right) player.x += player.speed;
+}
+
+// Render game
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Gambar player
-    ctx.drawImage(assets.player, player.x, player.y, player.width, player.height);
-    
-    // Gambar blok
-    blocks.forEach(block => {
-        ctx.drawImage(assets[block.type], block.x, block.y, 40, 40);
-    });
-
-    requestAnimationFrame(draw);
+    drawWorld();
+    ctx.fillStyle = "red";
+    ctx.fillRect(player.x, player.y, player.width, player.height);
 }
 
-// Gerakan
-function moveLeft() { player.x -= player.speed; }
-function moveRight() { player.x += player.speed; }
-function jump() {
-    if (!player.jumping) {
-        player.velocityY = -10;
-        player.jumping = true;
-    }
+// Loop game
+function gameLoop() {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
 }
 
-// Update posisi
-function update() {
-    player.y += player.velocityY;
-    player.velocityY += gravity;
-    
-    if (player.y >= 500) { 
-        player.y = 500;
-        player.jumping = false;
-    }
-    
-    requestAnimationFrame(update);
-}
-
-// Pilih blok di inventori
-function selectBlock(type) {
-    selectedBlock = type;
-}
-
-// Hancurkan blok
-canvas.addEventListener("click", (event) => {
-    const clickX = event.clientX - canvas.offsetLeft;
-    const clickY = event.clientY - canvas.offsetTop;
-    
-    blocks.forEach((block, index) => {
-        if (clickX > block.x && clickX < block.x + 40 &&
-            clickY > block.y && clickY < block.y + 40) {
-            if (selectedBlock === "empty") {
-                blocks.splice(index, 1);
-            }
-        }
-    });
-});
-
-// Letakkan blok baru
-canvas.addEventListener("contextmenu", (event) => {
-    event.preventDefault();
-    if (selectedBlock !== "empty") {
-        const clickX = Math.floor((event.clientX - canvas.offsetLeft) / 40) * 40;
-        const clickY = Math.floor((event.clientY - canvas.offsetTop) / 40) * 40;
-        
-        if (!blocks.some(block => block.x === clickX && block.y === clickY)) {
-            blocks.push({ x: clickX, y: clickY, type: selectedBlock });
-        }
-    }
-});
-
-// Mulai game
-draw();
-update();
+gameLoop();
